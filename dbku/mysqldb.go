@@ -26,6 +26,7 @@ func InitDB() {
 	// ini untuk migrasi skema table awal biar automatis
 	varglobal.DB.AutoMigrate(&model.Book{})
 	varglobal.DB.AutoMigrate(&model.Inventory{})
+	varglobal.DB.AutoMigrate(&model.Category{})
 	fmt.Println("Database migration completed")
 
 }

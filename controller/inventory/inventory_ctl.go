@@ -27,7 +27,7 @@ func GetInventory(c *gin.Context) {
 	}
 
 	var inventories []model.Inventory
-	query := varglobal.DB.Model(&model.Inventory{})
+	query := varglobal.DB.Preload("Category").Model(&model.Inventory{})
 
 	// Filter by search keyword
 	if search != "" {
@@ -39,6 +39,13 @@ func GetInventory(c *gin.Context) {
 	if yearParam != "" {
 		query = query.Where("year = ?", yearParam)
 	}
+
+	//filter by category (jika ada)
+	if category := c.Query("category_id"); category != "" {
+		query = query.Where("category_id", category)
+	}
+
+	// filter by quantity (jika ada)
 
 	// Hitung total
 	var total int64

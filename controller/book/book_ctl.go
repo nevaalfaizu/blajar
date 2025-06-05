@@ -33,8 +33,8 @@ func GetBooks(c *gin.Context) {
 	}
 
 	// Filter data sesuai search dan tahun (jika ada)
-	var inventories []model.Book
-	query := varglobal.DB.Model(&model.Book{})
+	var books []model.Book
+	query := varglobal.DB.Preload("Category").Model(&model.Book{})
 
 	// Filter by search keyword
 	if search != "" {
@@ -47,13 +47,18 @@ func GetBooks(c *gin.Context) {
 		query = query.Where("year = ?", yearParam)
 	}
 
+	// Filter by category (jika ada)
+	if category := c.Query("category_id"); category != "" {
+		query = query.Where("category_id = ?", category)
+	}
+
 	// Hitung total
 	var total int64
 	query.Count(&total)
 
 	// Pagination
 	offset := (page - 1) * limit
-	err := query.Limit(limit).Offset(offset).Find(&inventories).Error
+	err := query.Limit(limit).Offset(offset).Find(&books).Error
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to retrieve inventory"})
 		return
@@ -64,7 +69,7 @@ func GetBooks(c *gin.Context) {
 		"page":   page,
 		"limit":  limit,
 		"total":  total,
-		"items":  inventories,
+		"items":  books,
 		"search": search,
 		"year":   yearParam,
 	})
