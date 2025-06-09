@@ -7,6 +7,7 @@ import (
 
 func main() {
 
+	app.LoadConfig() // Load configuration from .env file
 	dbku.InitDB()
 	app.StartApi()
 
